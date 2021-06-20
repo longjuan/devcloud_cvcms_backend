@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cvc.cvcms.dao.GoodsDao">
+
+    <insert id="addGood" parameterType="goods">
+        insert into
+            goods(goods_name, price, stock, stock_warning, is_stock_decimal, bar_code, is_on_sale, supplier_id, stock_unit, classification)
+        values
+            (#{goodsName},#{price},#{stock},#{stockWarning},#{stockDecimal},#{barCode},#{onSale},#{supplierId},#{stockUnit},#{classification}) ;
+    </insert>
+
+    <delete id="deleteGoods">
+        delete from
+            goods
+        where
+            id = #{goodsId} ;
+    </delete>
+
+    <update id="updateGoods" parameterType="goods">
+        update
+            goods
+        set
+            goods_name = #{goodsName},
+            price = #{price},
+            stock = #{stock},
+            stock_warning = #{stockWarning},
+            is_stock_decimal = #{stockDecimal},
+            bar_code = #{barCode},
+            is_on_sale = #{onSale},
+            supplier_id = #{supplierId},
+            stock_unit = #{stockUnit},
+            classification = #{classification}
+        where
+            id = #{id} ;
+    </update>
+
+    <select id="findGoodsById" resultType="com.cvc.cvcms.pojo.Goods">
+        SELECT
+            g.id, g.goods_name goodsName, g.price, g.stock, g.stock_warning stockWarning, g.is_stock_decimal stockDecimal, g.bar_code barCode, g.is_on_sale onSale, g.supplier_id supplierId, g.stock_unit stockUnit, g.classification,p.promotion_price,p.start_time,p.end_time
+        FROM
+            goods g
+                LEFT JOIN promotion p ON g.id = p.goods_id
+        where
+            g.id = #{id} ;
+    </select>
+    <select id="getGoodsByBarCode" resultType="com.cvc.cvcms.pojo.Goods">
+        SELECT
+            g.id, g.goods_name goodsName, g.price, g.stock, g.stock_warning stockWarning, g.is_stock_decimal stockDecimal, g.bar_code barCode, g.is_on_sale onSale, g.supplier_id supplierId, g.stock_unit stockUnit, g.classification,p.promotion_price,p.start_time,p.end_time
+        FROM
+            goods g
+                LEFT JOIN promotion p ON g.id = p.goods_id
+        where
+            g.bar_code = #{barCode} ;
+    </select>
+    <select id="getGoodsByConditions" resultType="com.cvc.cvcms.pojo.Goods">
+        SELECT
+            g.id, g.goods_name goodsName, g.price, g.stock, g.stock_warning stockWarning, g.is_stock_decimal stockDecimal, g.bar_code barCode, g.is_on_sale onSale, g.supplier_id supplierId, g.stock_unit stockUnit, g.classification,p.promotion_price,p.start_time,p.end_time
+        FROM
+            goods g
+                LEFT JOIN promotion p ON g.id = p.goods_id
+        WHERE
+            1=1
+              <if test="goodsName != null">
+                AND
+                MATCH (g.goods_name)
+                AGAINST (#{goodsName})
+              </if>
+              <if test="classification != null">
+                AND
+                g.classification = #{classification}
+              </if>
+              <if test="onSale != null">
+                AND
+                g.is_on_sale = #{onSale}
+              </if>
+        limit #{offset},#{size};
+    </select>
+    <select id="getNumOfGoodsByConditions" resultType="int">
+        SELECT
+            count(id)
+        FROM
+            goods
+        WHERE
+            1=1
+            <if test="goodsName != null">
+                AND
+                MATCH (goods_name)
+                AGAINST (#{goodsName})
+            </if>
+            <if test="classification != null">
+                AND
+                classification = #{classification}
+            </if>
+            <if test="onSale != null">
+                AND
+                is_on_sale = #{onSale}
+            </if>
+    </select>
+    <select id="getGoodsBySupplierId" resultType="com.cvc.cvcms.pojo.Goods">
+        SELECT
+            g.id, g.goods_name goodsName, g.price, g.stock, g.stock_warning stockWarning, g.is_stock_decimal stockDecimal, g.bar_code barCode, g.is_on_sale onSale, g.supplier_id supplierId, g.stock_unit stockUnit, g.classification,p.promotion_price,p.start_time,p.end_time
+        FROM
+            goods g
+                LEFT JOIN promotion p ON g.id = p.goods_id
+        WHERE
+            g.supplier_id = #{supplierId}
+    </select>
+
+    <update id="GoodsUp">
+        update
+            goods
+        set
+            is_on_sale = 1
+        where
+            id = #{id} ;
+    </update>
+
+    <update id="GoodsDown">
+        update
+            goods
+        set
+            is_on_sale = 0
+        where
+            id = #{id} ;
+    </update>
+</mapper>

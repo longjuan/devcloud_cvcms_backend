@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cvc.cvcms.dao.OrderDao">
+
+    <insert id="saveOrder" parameterType="order">
+        <selectKey keyProperty="id" order="AFTER" resultType="integer" keyColumn="id">
+            select last_insert_id();
+        </selectKey>
+        insert into
+            `order`(order_date, warehousing_date, acceptance_date, amount, status, supplier_id)
+        values
+            (#{orderDate},#{warehousingDate},#{acceptanceDate},#{amount},#{status},#{supplierId});
+    </insert>
+
+    <insert id="saveOrderAndGoods" parameterType="ordertogoods">
+        insert into
+            order_product
+        values
+            (#{orderId},#{goodsId},#{quantity});
+    </insert>
+
+    <select id="getOrderAndGoods" resultType="com.cvc.cvcms.pojo.OrderToGoods">
+        select
+               *
+        from
+             order_product
+        where
+              order_id = #{orderId};
+    </select>
+
+    <select id="getOrderById" resultType="com.cvc.cvcms.pojo.dto.OrderDTO">
+        select
+            o.id, o.order_date, o.warehousing_date, o.acceptance_date,o.amount, o.status, o.supplier_id, s.name
+        from
+             `order` o left join supplier s on o.supplier_id = s.id
+        where
+                  o.id = #{id};
+    </select>
+
+    <select id="getAllOrder" resultType="com.cvc.cvcms.pojo.dto.OrderDTO">
+        select
+            o.id, o.order_date, o.warehousing_date, o.acceptance_date,o.amount, o.status, o.supplier_id, s.name
+        from
+            `order` o left join supplier s on o.supplier_id = s.id
+    </select>
+
+    <update id="updateStatus">
+        update
+            `order`
+        <trim prefix="set" suffixOverrides=",">
+            <if test='status == "2"'>
+                acceptance_date = #{date},
+            </if>
+            <if test='status == "3"'>
+                warehousing_date = #{date},
+            </if>
+            status =#{status}
+        </trim>
+        where
+              id =#{id};
+    </update>
+
+    <select id="getOrderInfoById" resultType="orderinfodto">
+        select
+                order_product.quantity,goods.goods_name,goods.price
+        from
+                order_product left join goods on order_product.goods_id = goods.id
+        where
+                order_id = #{id};
+    </select>
+</mapper>

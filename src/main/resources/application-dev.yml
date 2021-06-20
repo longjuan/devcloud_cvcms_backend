@@ -1,0 +1,63 @@
+# 数据库
+spring:
+  datasource:
+    username: #数据库用户
+    password: #数据库密码
+    url: #数据库url
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 0B
+      max-file-size: 2MB
+      max-request-size: 10MB
+      resolve-lazily: false
+  # redis配置
+  redis:
+    host: 127.0.0.1
+    port: 6379
+  #    下面两个是为了遇到错误返回json
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
+  # 日期格式化
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+# Mybatis配置
+mybatis:
+  mapper-locations: classpath:mapping/*.xml
+  type-aliases-package: com.cvc.cvcms.pojo
+  configuration:
+    map-underscore-to-camel-case: true
+
+# 编码格式
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+# jwt设置
+jwt:
+  secret: efwsa684w8e84wyriuhuaku8
+  expiration: 86400000
+  header: JWTToken
+
+ftp:
+  host: #服务器名称
+  port: #开放端口
+  username: #服务器用户
+  password: #服务器密码
+  dir: /images
+
+# 微信小程序参数
+wechat:
+  appid: #
+  secret: #
+  grant_type: #
+  login_url: #

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cvc.cvcms.dao.CouponDao">
+    <insert id="addCoupon" parameterType="com.cvc.cvcms.pojo.Coupon">
+        <selectKey  keyProperty="id" order="AFTER" resultType="integer">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into
+            coupon(coupon_code, description, start_time, end_time, is_limited, start_price, decresed_price)
+        value
+            (#{couponCode},#{description},#{startTime},#{endTime}, #{limited}, #{startPrice}, #{decresedPrice})
+    </insert>
+    <insert id="addUserAndCoupon" parameterType="com.cvc.cvcms.pojo.UserAndCoupon">
+        <selectKey  keyProperty="id" order="AFTER" resultType="integer">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into
+        user_coupon(username, coupon_id, quantity)
+        value
+        (#{userName}, #{couponId}, #{quantity})
+    </insert>
+
+
+    <delete id="deleteCouponById" >
+        delete from
+            coupon
+        where
+            id = #{couponId}
+    </delete>
+
+    <delete id="deleteCouponByCode" >
+        delete from
+            coupon
+        where
+            coupon_code = #{couponCode}
+    </delete>
+
+    <update id="updateCoupon" parameterType="com.cvc.cvcms.pojo.Coupon">
+        update
+            coupon
+        <trim prefix="set" suffixOverrides=",">
+            <if test="couponCode != null">
+                coupon_code = #{couponCode}
+            </if>
+            <if test="description != null">
+                description = #{description}
+            </if>
+            <if test="startTime != null">
+                start_time = #{startTime}
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime}
+            </if>
+            <if test="limited != null">
+                is_limited = #{limited}
+            </if>
+            <if test="startPrice !=null">
+                start_price = #{startPrice}
+            </if>
+            <if test=" decresedPrice = null">
+                decresed_price = #{descriptionPrice}
+            </if>
+            <if test=" status != null">
+                status = #{status}
+            </if>
+        </trim>
+        where
+            id = #{id}
+    </update>
+    <update id="reduceUserCoupon">
+        update user_coupon
+        set
+            quantity = quantity - 1
+        where
+            username = #{username}
+          AND coupon_id = #{couponId}
+    </update>
+
+    <update id="UserClaimCoupon">
+        update user_coupon
+        set
+            quantity = quantity + #{quantity}
+        where
+            username = #{userName}
+          AND coupon_id = #{couponId}
+    </update>
+
+    <select id="findAllCoupon" resultType="com.cvc.cvcms.pojo.Coupon">
+        select
+            *
+        from
+            coupon
+    </select>
+
+    <delete id="deleteUserCoupon">
+        DELETE FROM
+            user_coupon
+        WHERE
+            username = #{username}
+          AND coupon_id = #{couponId}
+    </delete>
+
+
+    <select id="getCouponById" resultType="com.cvc.cvcms.pojo.Coupon">
+        SELECT
+            *
+        FROM
+            coupon
+        WHERE
+            id = #{id}
+    </select>
+    <select id="getCouponByCode" resultType="com.cvc.cvcms.pojo.Coupon">
+        SELECT
+            *
+        FROM
+            coupon
+        WHERE
+            coupon_code = #{code}
+    </select>
+    <select id="hasCouponQuantity" resultType="java.lang.Integer">
+        SELECT
+            quantity
+        FROM
+            user_coupon
+        WHERE
+            username = #{username}
+          AND coupon_id = #{couponId}
+    </select>
+    <select id="getLimitGoodsBarCode" resultType="java.lang.String">
+        select
+            goods_bar_code
+        from
+            coupon_goods
+        where
+            coupon_id = #{couponId}
+    </select>
+    <select id="getCouponByUser" resultType="com.cvc.cvcms.pojo.Coupon">
+        SELECT
+	        *
+        FROM
+	        coupon
+        WHERE
+	        id IN ( SELECT coupon_id FROM user_coupon WHERE username = #{userName})
+    </select>
+    <select id="getUserAndCoupon" resultType="com.cvc.cvcms.pojo.UserAndCoupon">
+        SELECT
+	        *
+        FROM
+	        user_coupon
+        WHERE
+	        username = #{userName}
+          AND coupon_id = #{couponId}
+    </select>
+
+</mapper>

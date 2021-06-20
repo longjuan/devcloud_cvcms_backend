@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cvc.cvcms.dao.StaffInfoDao">
+
+    <select id="getByUserid" resultType="com.cvc.cvcms.pojo.StaffInfo">
+        select
+            user_id,`name`,gender,phone,entry_time,picture
+        from
+            staff_info
+        where
+            user_id = #{userId}
+    </select>
+
+    <select id="getAll" resultType="staffinfo">
+        select
+            *
+        from
+             staff_info ;
+    </select>
+
+    <select id="getNums" resultType="int">
+        select
+            count(*)
+        from
+            staff_info ;
+    </select>
+</mapper>

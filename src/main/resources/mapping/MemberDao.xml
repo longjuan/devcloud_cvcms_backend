@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cvc.cvcms.dao.MemberDao">
+
+    <select id="getMemberInfo" resultType="com.cvc.cvcms.pojo.MemberInfo">
+        select
+               username,points,phone
+        from
+            member_info
+        where
+            username = #{username}
+    </select>
+    <select id="getMemberPointsExchanges" resultType="com.cvc.cvcms.pojo.MemberPointsExchange">
+        select
+            username,content,points,`date`
+        from
+            member_points_exchange
+        where
+            username = #{username}
+    </select>
+
+    <insert id="addMemberInfo">
+        insert into
+            member_info(username, points, phone)
+        values
+            (#{username},0,0);
+    </insert>
+
+</mapper>

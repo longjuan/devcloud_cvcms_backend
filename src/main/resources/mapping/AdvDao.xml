@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cvc.cvcms.dao.AdvDao">
+    <insert id="release">
+        insert into
+            advertisement(img,detail,start_time,end_time)
+        values
+               (#{img},#{detail},#{startTime},#{endTime}) ;
+    </insert>
+
+    <delete id="deleteAdvertisementById">
+        delete from
+            advertisement
+        where
+            id = #{advertisementId}
+    </delete>
+
+    <update id="updateAdvertisement" parameterType="com.cvc.cvcms.pojo.Advertisement">
+        update
+            advertisement
+        <trim prefix="set" suffixOverrides=",">
+            <if test="img !=null" >
+                img = #{img},
+            </if>
+            <if test="detail !=null" >
+                detail = #{detail},
+            </if>
+            <if test="startTime !=null" >
+                start_time = #{startTime},
+            </if>
+            <if test="endTime !=null" >
+                end_time = #{endTime},
+            </if>
+            <if test="status !=null" >
+                status = #{status}
+            </if>
+        </trim>
+        where
+            id = #{id};
+    </update>
+
+    <select id="findAdvertisementById" resultType="com.cvc.cvcms.pojo.Advertisement">
+        select
+            a.id, a.img, a.detail, a.start_time, a.end_time, a.status
+        from
+            advertisement a
+        where
+            a.id = #{advertisementId}
+    </select>
+
+    <select id="findAllAdvertisement" resultType="com.cvc.cvcms.pojo.Advertisement">
+        select
+            *
+        from
+            advertisement
+
+    </select>
+
+    <select id="findAllPublishedAdvertisement" resultType="com.cvc.cvcms.pojo.Advertisement">
+        select
+            *
+        from
+            advertisement
+
+        where
+            status = 1
+
+    </select>
+
+</mapper>

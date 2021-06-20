@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cvc.cvcms.dao.SalesDao">
+
+
+    <insert id="saveSalesRecord" parameterType="com.cvc.cvcms.pojo.SalesRecord">
+        <selectKey  keyProperty="id" order="AFTER" resultType="integer">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into sales_record(member_id,`date`,amount)
+        VALUES
+            (#{memberId},#{date},#{amount})
+    </insert>
+    <insert id="saveSalesItem" parameterType="com.cvc.cvcms.pojo.SalesItem">
+        <selectKey  keyProperty="id" order="AFTER" resultType="integer">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into sales_item(goods_id,goods_name,price,quantity,subtotal)
+        VALUES
+            (#{goodsId},#{goodsName},#{price},#{quantity},#{subtotal})
+    </insert>
+    <insert id="saveSalesRecordToItem" parameterType="com.cvc.cvcms.pojo.SalesRecordToItem">
+        insert into sales_record_to_item(sales_record_id,sales_item_id)
+        VALUES
+            (#{salesRecordId},#{salesItemId})
+    </insert>
+    <insert id="saveSalesCoupon" parameterType="com.cvc.cvcms.pojo.SalesCoupon">
+        insert into sales_coupon(sale_id,coupon_id,decresed_price)
+        VALUES
+            (#{saleId},#{couponId},#{decresedPrice})
+    </insert>
+    <select id="getSalesRecordsAndUsername" resultType="com.cvc.cvcms.pojo.dto.SalesRecordAndUsernameDTO">
+        select
+            s.`id`,s.member_id,s.`date`,s.amount,u.username
+        from
+            sales_record s left join `user` u on s.member_id = u.id
+        where 1=1
+              <if test="start != null">
+                and
+                  s.`date` <![CDATA[ >= ]]> #{start}
+                and
+                  s.`date` <![CDATA[ < ]]> #{end}
+              </if>
+        order by s.`date` desc
+        limit #{offset},#{size};
+    </select>
+    <select id="getSalesRecordNum" resultType="java.lang.Integer">
+        select
+            count(id)
+        from
+        sales_record
+        where 1=1
+        <if test="start != null">
+            and
+            `date` <![CDATA[ >= ]]> #{start}
+            and
+            `date` <![CDATA[ < ]]> #{end}
+        </if>
+    </select>
+    <select id="getTurnover" resultType="java.math.BigDecimal">
+        SELECT
+            SUM( amount )
+        FROM
+            sales_record
+        WHERE
+            `date` <![CDATA[ >= ]]> #{start}
+            AND
+              `date` <![CDATA[ < ]]> #{end}
+    </select>
+    <select id="getStatisticsClassification" resultType="com.cvc.cvcms.pojo.dto.StatisticsClassificationDTO">
+        SELECT
+            SUM( i.subtotal ) amount,
+            g.classification
+        FROM
+            sales_record r,
+            sales_item i,
+            sales_record_to_item ri,
+            goods g
+        WHERE
+            i.goods_id IS NOT NULL
+          AND r.id = ri.sales_record_id
+          AND ri.sales_item_id = i.id
+          AND i.goods_id = g.id
+          AND r.`date` <![CDATA[ >= ]]> #{start}
+          AND r.`date` <![CDATA[ < ]]> #{end}
+        GROUP BY
+            g.classification
+    </select>
+    <select id="getSalesRecordsByUserId" resultType="com.cvc.cvcms.pojo.SalesRecord">
+        select
+            `id`,member_id,`date`,amount
+        from
+            sales_record
+        where
+            member_id = #{userId}
+        limit #{offset},#{size};
+    </select>
+    <select id="getNumOfSalesRecordsByUserId" resultType="java.lang.Integer">
+        select
+            count(id)
+        from
+            sales_record
+        where
+            member_id = #{userId}
+    </select>
+    <select id="getSalesRecordAndUsernameDto" resultType="com.cvc.cvcms.pojo.dto.SalesRecordAndUsernameDTO">
+        select
+            s.`id`,s.member_id,s.`date`,s.amount,u.username
+        from
+            sales_record s left join `user` u on s.member_id = u.id
+        where
+            s.`id` = #{id}
+    </select>
+    <select id="getSalesItems" resultType="com.cvc.cvcms.pojo.SalesItem">
+        SELECT
+            id,goods_id,goods_name,price,quantity,subtotal
+        FROM
+            sales_record_to_item t,
+            sales_item i
+        WHERE
+            t.sales_item_id = i.id
+          AND t.sales_record_id = #{salesRecordId}
+    </select>
+    <select id="getSalesCoupons" resultType="com.cvc.cvcms.pojo.SalesCoupon">
+        SELECT
+            sale_id,coupon_id,decresed_price
+        FROM
+            sales_coupon
+        WHERE
+            sale_id = #{salesRecordId}
+    </select>
+    
+    <select id="getSalesCouponsDTO" resultType="salescouponandcodedto">
+        select
+            sales_coupon.sale_id,sales_coupon.coupon_id,sales_coupon.decresed_price,c.coupon_code
+        from
+            sales_coupon
+                left join coupon c
+                          on c.id = sales_coupon.coupon_id
+        where
+            sale_id = #{salesRecordId}
+    </select>
+
+    <select id="getSalesRecords" resultType="int">
+        select
+               count(*)
+        from
+             sales_record
+        where
+              date(date)=CURRENT_DATE();
+    </select>
+</mapper>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cvc.cvcms.dao.PromotionDao">
+    <insert id="addPromotion" parameterType="com.cvc.cvcms.pojo.Promotion">
+        insert into
+            promotion(goods_id, promotion_price, start_time, end_time)
+        values
+               (#{goodsId},#{promotionPrice},#{startTime},#{endTime}) ;
+    </insert>
+    
+    <delete id="deletePromotionById">
+        delete from
+            promotion
+        where
+            goods_id = #{goodsId}
+    </delete>
+
+
+    <update id="updatePromotion" parameterType="promotion">
+        update
+            promotion
+        <trim prefix="set" suffixOverrides=",">
+            <if test="promotionPrice != null">
+                promotion_price = #{promotionPrice},
+            </if>
+            <if test="startTime != null">
+                start_time = #{startTime},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime},
+            </if>
+        </trim>
+            where
+                goods_id = #{goodsId}
+    </update>
+
+    <select id="findAllPromotion" parameterType="com.cvc.cvcms.pojo.Promotion">
+        select
+            *
+        from
+            promotion
+    </select>
+
+    <select id="findPromotionById" resultType="com.cvc.cvcms.pojo.Promotion">
+        select
+            *
+        from
+            promotion
+        where
+            goods_id = #{goodsId}
+    </select>
+</mapper>

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cvc.cvcms.dao.UserDao">
+
+
+    <select id="getUserByCondition" resultType="userstaffdto">
+        select
+            *
+        from
+                `user`
+            left join
+                staff_info si on user.id = si.user_id
+            left join
+                role r on r.id = user.role_id
+        where
+            1=1
+        <if test="roleId != null">
+            AND `user`.role_id = #{roleId}
+        </if>
+        <if test="gender != null">
+            AND si.gender = #{gender}
+        </if>
+        <if test="name != ''">
+            AND si.name = #{name}
+        </if>
+            AND role_id != 5;
+    </select>
+
+    <select id="getUserByName" resultType="com.cvc.cvcms.pojo.User">
+        SELECT
+            `user`.id,`user`.username,`user`.`password`,`user`.is_frozen frozen,role_name
+        FROM
+            `user`,
+            role
+        WHERE
+            `user`.username = #{username}
+          AND `user`.role_id = role.id
+    </select>
+
+    <select id="getPermissionByRoleName" resultType="string">
+        SELECT
+            permission.`code`
+        FROM
+            role,
+            role_permission,
+            permission
+        WHERE
+            role.role_name = #{roleName}
+          AND role_permission.role_id = role.id
+          AND permission.id = role_permission.permission_id
+    </select>
+
+    <select id="getUsersNoPassword" resultType="com.cvc.cvcms.pojo.User">
+        SELECT
+            `user`.id,`user`.username,`user`.is_frozen frozen,role_name
+        FROM
+            `user`,
+            role
+        WHERE
+            `user`.role_id = role.id
+    </select>
+
+    <select id="getUserById" resultType="com.cvc.cvcms.pojo.User">
+        SELECT
+            `user`.id,`user`.username,`user`.`password`,`user`.is_frozen frozen,role_name
+        FROM
+            `user`,
+            role
+        WHERE
+            `user`.id = #{id}
+          AND `user`.role_id = role.id
+    </select>
+
+    <select id="getStaffByName" resultType="userstaffdto">
+        SELECT
+            `user`.id,`user`.username,`user`.is_frozen frozen,si.name,si.gender,si.phone,si.entry_time,r.role_name,r.description
+        FROM
+            `user`
+                left join
+                    staff_info si on user.id = si.user_id
+                left outer join
+                    role r on r.id = user.role_id
+        WHERE
+            username = #{username} AND role_id != 5 ;
+    </select>
+
+    <select id="getStaffsNoPassword" resultType="userstaffdto">
+        SELECT
+            `user`.id,`user`.username,`user`.is_frozen frozen,si.name,si.gender,si.phone,si.entry_time,r.role_name,r.description
+        FROM
+            `user`
+                left join
+            staff_info si on user.id = si.user_id
+                left outer join
+            role r on r.id = user.role_id
+        WHERE role_id != 5 ;
+    </select>
+
+
+    <update id="freezeByUserId">
+        update
+            user
+        set
+            is_frozen=1
+        where
+            id=#{userId} ;
+    </update>
+
+    <update id="thawByUserId">
+        update
+            user
+        set
+            is_frozen=0
+        where
+            id=#{userId} ;
+    </update>
+    <update id="updatePW">
+        update
+            `user`
+        set
+            password=#{param2}
+        where
+            id=#{param1} ;
+    </update>
+
+    <insert id="add">
+        insert into
+            user(username,password,is_frozen,role_id)
+        values
+            (#{username},#{password},0,#{roleid}) ;
+    </insert>
+
+    <insert id="addInfo">
+        insert into
+            staff_info
+        values
+            (#{id},#{name},#{gender},#{phone},#{time},#{picture});
+    </insert>
+
+    <select id="getAll" resultType="int">
+        select
+             count(*)
+        from
+             cvc.user;
+    </select>
+
+    <select id="getGoodsOnSale" resultType="int">
+        SELECT
+             count(*)
+        FROM
+             cvc.goods
+        where
+             is_on_sale=1;
+    </select>
+    
+    <select id="getComplain" resultType="int">
+        select
+               count(*)
+        from
+             complain ;
+    </select>
+
+    <select id="getMoney" resultType="BigDecimal">
+        SELECT
+             sum(amount)
+        FROM
+             cvc.sales_record
+        where
+             date(date)=curdate();
+    </select>
+
+    <select id="getYesterdayMoney" resultType="bigdecimal">
+        SELECT
+            sum(amount)
+        FROM
+            cvc.sales_record
+        where
+            date(date) = date_sub(curdate(),interval 1 day)
+    </select>
+
+    <select id="getRole" resultType="role">
+        select * from role;
+    </select>
+
+    <select id="getMemberByName" resultType="user">
+        select
+               *
+        from
+             user
+        where
+              role_id=5
+              and
+              username=#{username};
+    </select>
+</mapper>
